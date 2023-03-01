@@ -137,6 +137,9 @@ class ColourWheelEffort(klibs.Experiment):
 
         # Before we start, measure the size range of the participant's pupil
         self.get_pupil_range()
+
+        # Show the task instructions to the participant
+        self.task_demo()
     
 
     def block(self):
@@ -201,11 +204,9 @@ class ColourWheelEffort(klibs.Experiment):
             cue_type = "neutral"
         
         # Dynamically alter the fixation/cue stimuli between trials
-        fix_pts = self.cue_pts["fixation"]
-        cue_pts = self.cue_pts[cue_type]
         fix_col = self.probe.fill_color if self.easy_trial else self.stim_grey
-        self.fixation = dot_grid(fix_pts, self.dot_size, self.dot_spacing, fix_col)
-        self.cue = dot_grid(cue_pts, self.dot_size, self.dot_spacing, fix_col)
+        self.fixation = self.render_fixation(fix_col)
+        self.cue = self.render_cue(cue_type, fix_col)
         
         # Add timecourse of events to EventManager
         self.probe_onset = random.randrange(1000, 3050, 50)
@@ -365,6 +366,155 @@ class ColourWheelEffort(klibs.Experiment):
         fill(self.bg_fill)
         blit(self.wheel, location=P.screen_c, registration=5)
         flip()
+
+
+    def render_fixation(self, color):
+        fix_pts = self.cue_pts["fixation"]
+        return dot_grid(fix_pts, self.dot_size, self.dot_spacing, color)
+
+
+    def render_cue(self, cue_type, color):
+        cue_pts = self.cue_pts[cue_type]
+        return dot_grid(cue_pts, self.dot_size, self.dot_spacing, color)
+
+
+    def show_demo_text(self, msgs, stim_set, duration=1.0, wait=True, msg_y=None):
+        msg_x = int(P.screen_x / 2)
+        msg_y = int(P.screen_y * 0.25) if msg_y is None else msg_y
+        half_space = deg_to_px(0.5)
+
+        fill()
+        if not isinstance(msgs, list):
+            msgs = [msgs]
+        for msg in msgs:
+            txt = message(msg, blit_txt=False, align="center")
+            blit(txt, 8, (msg_x, msg_y))
+            msg_y += txt.height + half_space
+    
+        for stim, locs in stim_set:
+            if not isinstance(locs, list):
+                locs = [locs]
+            for loc in locs:
+                blit(stim, 5, loc)
+        flip()
+        smart_sleep(duration * 1000)
+        if wait:
+            any_key()
+
+
+    def demo_cue_target(self, text, base_layout, cue_type, target_loc, pretarget=None):
+        # Render stimuli
+        target_col = self.wheel.color_from_angle(random.randrange(0, 360, 1))
+        cue = self.render_cue(cue_type, self.stim_grey)
+        target = kld.Ellipse(self.probe_diameter, fill=target_col)
+        # Show example event sequence
+        if pretarget:
+            self.show_demo_text(
+                text, base_layout + [(cue, P.screen_c)], duration=pretarget, wait=False
+            )
+        else:
+            self.show_demo_text(
+                text, base_layout + [(cue, P.screen_c)],
+            )
+        self.show_demo_text(
+            " ", base_layout + [(cue, P.screen_c), (target, target_loc)],
+            duration=0.15, wait=False
+        )
+        self.show_demo_text(
+            " ", base_layout + [(cue, P.screen_c)],
+            duration=0.6, wait=False
+        )
+
+
+    def task_demo(self):
+        # Initialize task stimuli for the demo
+        self.probe = kld.Ellipse(self.probe_diameter, fill=None)
+        self.probe.fill = self.wheel.color_from_angle(90)
+        fixation_grey = self.render_fixation(self.stim_grey)
+        base_layout = [
+            (self.box, self.box_l_pos),
+            (self.box, self.box_r_pos),
+            (self.placeholder, self.box_l_pos),
+            (self.placeholder, self.box_r_pos),
+        ]
+        
+        # Actually run through demo
+        self.show_demo_text(
+            "Welcome to the experiment! This tutorial will help explain the task.",
+            base_layout + [(fixation_grey, P.screen_c)]
+        )
+        self.show_demo_text(
+            ("On most trials of the task, a colour target will appear briefly in one\n"
+             "of two locations on the screen after a random delay."),
+            base_layout + [(fixation_grey, P.screen_c), (self.probe, self.box_l_pos)],
+        )
+        self.show_demo_text(
+            ("Your job will be to respond quickly to these targets when they appear\n"
+             "by pressing the space bar on the keyboard."),
+            base_layout + [(fixation_grey, P.screen_c)]
+        )
+        self.show_demo_text(
+            ("At some point before each target appears, a spatial cue will appear in\n"
+              "the middle of the screen to direct your attention to one of the two\n"
+              "possible target locations."),
+            base_layout + [(self.render_cue("left", self.stim_grey), P.screen_c)]
+        )
+        self.demo_cue_target(
+            ("If the cue is a left arrow, the target will most likely (but not always)\n"
+             "appear in the left location."),
+            base_layout, cue_type="left", target_loc=self.box_l_pos
+        )
+        self.demo_cue_target(
+            ("Likewise, if the cue is a right arrow, the target will most likely\n"
+             "appear in the right location."),
+            base_layout, cue_type="right", target_loc=self.box_r_pos
+        )
+        self.demo_cue_target(
+            ("If the cue is an 'X', this means that the target is equally likely to\n"
+             "appear at either location."),
+            base_layout, cue_type="neutral", target_loc=self.box_r_pos
+        )
+        self.show_demo_text(
+            ("If a trial starts with a *grey* fixation cross, this means that in "
+             "addition\nto detecting the target, you will also need to report its "
+             "colour."),
+            base_layout + [(fixation_grey, P.screen_c)]
+        )
+        self.demo_cue_target(
+            " ", base_layout, cue_type="left", target_loc=self.box_l_pos, pretarget=1.2
+        )
+        self.show_demo_text(
+            ("On these trials, a colour wheel will appear on screen after you respond\n"
+             "to the target. When this happens, please click the colour on the wheel\n"
+             "that best matches the colour of the target you just saw."),
+            [(self.wheel, P.screen_c)], msg_y=int(P.screen_y * 0.1)
+        )
+        demo_col = self.wheel.color_from_angle(180)
+        self.probe.fill = demo_col
+        fixation_col = self.render_fixation(demo_col)
+        self.show_demo_text(
+            ("On the other hand, if the trial starts with a *colorful* fixation cross, "
+             "you only\nneed to detect the target and will not be asked to report its "
+             "color."),
+            base_layout + [(fixation_col, P.screen_c)]
+        )
+        self.show_demo_text(
+            ["Before each trial, a diamond will appear in the middle of the screen.",
+             ("To start the trial, please look directly at the center of the diamond\n"
+              "and press the space bar."),
+            ],
+            [(self.dc_fixation, P.screen_c)], msg_y=int(P.screen_y * 0.2)
+        )
+        self.show_demo_text(
+            ("During each trial, do your best to keep your eyes fixed on the middle of "
+             "the\nscreen and use your peripheral vision to detect the targets."),
+            base_layout + [(fixation_grey, P.screen_c)]
+        )
+        self.show_demo_text(
+            ("Now that we've explained the basics, we'll do a few practice trials to\n"
+             "help you get comfortable with the task!"),
+            base_layout + [(fixation_grey, P.screen_c)]
+        )
 
 
     def get_pupil_range(self):
