@@ -343,7 +343,18 @@ class ColourWheelEffort(klibs.Experiment):
 
 
     def clean_up(self):
-        pass
+
+        txt = "You're all done!\n\nPress any key to exit the experiment."
+        fill()
+        message(txt, location=P.screen_c)
+        flip()
+        smart_sleep(200)
+        any_key()
+
+        if not "TryLink" in self.el.version:
+            fill()
+            message("Transferring EyeLink data, please wait...", location=P.screen_c)
+            flip()
 
 
     def draw_screen_layout(self):
