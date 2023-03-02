@@ -217,6 +217,10 @@ class ColourWheelEffort(klibs.Experiment):
         for e in events:
             self.evm.register_ticket(ET(e[1], e[0]))
 
+        # If it's been 40 trials since the last block or break, present break message
+        if P.trial_number > 1 and P.trial_number % 40 == 1:
+            self.break_msg()
+
         # Perform drift correct before each trial
         self.el.drift_correct(target=self.dc_fixation)
         
@@ -363,6 +367,20 @@ class ColourWheelEffort(klibs.Experiment):
         blit(self.box, 5, self.box_r_pos)
         blit(self.placeholder, 5, self.box_l_pos)
         blit(self.placeholder, 5, self.box_r_pos)
+
+
+    def break_msg(self):
+        msg1 = message("Take a break if you need one!")
+        msg2 = message("When ready, press any key to start the next trial.")
+        fill()
+        blit(msg1, 2, P.screen_c)
+        flip()
+        smart_sleep(1000)
+        fill()
+        blit(msg1, 2, P.screen_c)
+        blit(msg2, 8, (P.screen_c[0], int(P.screen_c[1] + 0.5 * msg1.height)))
+        flip()
+        any_key()
 
 
     def err_msg(self, msg):
