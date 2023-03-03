@@ -20,7 +20,7 @@ eye_tracking = True
 #########################################
 # Environment Aesthetic Defaults
 #########################################
-default_fill_color = (48, 48, 48, 255)
+default_fill_color = (64, 64, 64, 255)
 default_color = (255, 255, 255, 255)
 default_font_size = 0.5
 default_font_unit = 'deg'
