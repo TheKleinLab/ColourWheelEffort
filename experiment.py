@@ -61,7 +61,7 @@ class ColourWheelEffort(klibs.Experiment):
             cieluv.append(rgb.get_upscaled_value_tuple())
 
         # Other colors
-        self.bg_fill = BLACK
+        self.bg_fill = P.default_fill_color
         stim_grey = convert_color(LCHuvColor(75, 0, 0, illuminant='d65'), sRGBColor)
         self.stim_grey = stim_grey.get_upscaled_value_tuple()
 
