@@ -233,6 +233,7 @@ class ColourWheelEffort(klibs.Experiment):
             "practice": P.practicing,
             "difficulty": "easy" if self.easy_trial else "difficult",
             "catch_trial": self.catch_trial,
+            "cue_validity": self.cue_validity,
             "probe_loc": "NA" if self.catch_trial else self.probe_location,
             "probe_onset": 0 if self.catch_trial else self.probe_onset,
             "probe_rt": TIMEOUT,

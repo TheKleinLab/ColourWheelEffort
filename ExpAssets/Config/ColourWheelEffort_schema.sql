@@ -58,6 +58,7 @@ CREATE TABLE trials (
 	practice boolean not null,     /* whether trial is a practice trial */
 	difficulty text not null,      /* difficulty condition for the trial */
 	catch_trial boolean not null,  /* Whether the trial has a target or not */
+	cue_validity text not null,    /* validity of the central cue */
 	probe_loc text not null,       /* location of the color probe */
 	probe_onset float not null,    /* onset time (in ms) of the color probe */
 	probe_rt text not null,        /* simple detection reaction times (in ms) for probes */
