@@ -577,7 +577,7 @@ class ColourWheelEffort(klibs.Experiment):
         # Start recording and hold on black screen for 4 sec
         self.el.start(trial_number=0)
         self.el.write("PUPIL_BASELINE START")
-        smart_sleep(4000)
+        smart_sleep(5000)
 
         # Slowly ramp up to maximum brigthness (~4 sec)
         self.el.write("PUPIL_BASELINE INCREASE")
@@ -588,7 +588,7 @@ class ColourWheelEffort(klibs.Experiment):
             l += 1
 
         # Hold at maximum brightness for 4 sec
-        self.el.write("PULIL_BASELINE MAXIMUM")
+        self.el.write("PUPIL_BASELINE MAXIMUM")
         smart_sleep(4000)
 
         # Slowly ramp down to minimum brightness (~4 sec)
@@ -600,8 +600,8 @@ class ColourWheelEffort(klibs.Experiment):
             l -= 1
 
         # Hold at minimum brightness for 4 sec, then stop recording
-        self.el.write("PULIL_BASELINE MINIMUM")
-        smart_sleep(4000)
+        self.el.write("PUPIL_BASELINE MINIMUM")
+        smart_sleep(5000)
         self.el.write("PUPIL_BASELINE END")
         self.el.stop()
 
