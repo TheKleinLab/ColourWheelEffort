@@ -301,7 +301,8 @@ class ColourWheelEffort(klibs.Experiment):
                 trialdat["probe_rt"] = timer.elapsed() * 1000
                 break
             # Stop trial and show error if gaze leaves fixation before response
-            if not self.el.within_boundary('fixation', EL_GAZE_POS):#self.el.saccade_from_boundary('fixation'):
+            if self.el.saccade_from_boundary('fixation'):
+                #if not self.el.within_boundary('fixation', EL_GAZE_POS):
                 trialdat["trial_err"] = "gaze_err"
                 self.err_msg("Looked away!")
                 return trialdat
