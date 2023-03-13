@@ -209,7 +209,7 @@ class ColourWheelEffort(klibs.Experiment):
         self.cue = self.render_cue(cue_type, fix_col)
         
         # Add timecourse of events to EventManager
-        self.probe_onset = random.randrange(1000, 3050, 50)
+        self.probe_onset = random.randrange(1000, 1550, 50)
         events = []
         events.append([1000, 'cue_on'])
         events.append([1000 + self.probe_onset, 'probe_on'])
